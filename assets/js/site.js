@@ -38,11 +38,11 @@ if(artGrid){
   const renderArt=()=>{const v=activeTag==='All'?DATA.graphics:DATA.graphics.filter(i=>i.tag===activeTag);artGrid.innerHTML=v.map(i=>workCard(i)).join('');};
   renderFilters();renderArt();
 }
-mount('featured-graphics', DATA.graphics.slice(0,6).map(i=>workCard(i)).join(''));
+mount('featured-graphics', DATA.graphics.slice(-6).map(i=>workCard(i)).join(''));
 mount('archive-grid', DATA.archive.map(i=>workCard({...i,tag:'Archive'})).join(''));
 mount('process-grid', DATA.process.map(stepCard).join(''));
 mount('web-grid', DATA.web.map(i=>workCard(i)).join(''));
 mount('app-grid', DATA.apps.map(i=>workCard(i)).join(''));
-mount('featured-web', DATA.web.slice(0,3).map(i=>workCard(i)).join(''));
-mount('featured-apps', DATA.apps.slice(0,3).map(i=>workCard(i)).join(''));
+mount('featured-web', DATA.web.slice(-3).map(i=>workCard(i)).join(''));
+mount('featured-apps', DATA.apps.slice(-3).map(i=>workCard(i)).join(''));
 mount('rogue-areas', ROGUE_AREAS.map(a=>`<span>${a}</span>`).join(''));

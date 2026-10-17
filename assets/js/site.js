@@ -92,7 +92,8 @@ if(artGrid){
   renderFilters();
   renderArt();
 }
-mount('featured-graphics', DATA.graphics.slice(-6).map(i=>workCard(i)).join(''));
+const featuredPrintTitles = ['Vigo vest on rotary carousel','UK aid shirt on press platen','Ministry of Energy reflector vests','Lady Gunn salon gowns','UK aid shirts on rotary carousel','Kigorobya run tee on carousel'];
+mount('featured-graphics', featuredPrintTitles.map(title=>DATA.graphics.find(item=>item.title===title)).filter(Boolean).map(item=>workCard(item)).join(''));
 mount('archive-grid', DATA.archive.map(i=>workCard({...i,tag:'Archive'})).join(''));
 mount('process-grid', DATA.process.map(stepCard).join(''));
 mount('web-grid', DATA.web.map(i=>workCard(i)).join(''));

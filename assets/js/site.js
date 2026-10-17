@@ -7,9 +7,9 @@ const ICONS = {
 };
 const SWATCH = ['#ff5a1f','#ffd23f','#1f8a4c','#0f4c81','#7b2d8b','#111','#f4f1ea','#c1121f'];
 function initials(t){return t.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
-function workCard(item, opts){
-  const media = item.img ? `<img src="${item.img}" alt="${item.title}" loading="lazy">` : `<div class="mono">${initials(item.title)}</div>`;
-  const pill = `<span class="pill">${item.tag||item.eyebrow}</span>`;
+function workCard(item, opts={}){
+  const media = item.img ? (opts.gallery ? `<button type="button" class="project-preview" data-gallery-index="${opts.index}" aria-label="Open larger project photo"><img src="${item.img}" alt="${item.alt||item.title}" loading="lazy" decoding="async"><span>View photo <b aria-hidden="true">↗</b></span></button>` : `<img src="${item.img}" alt="${item.alt||item.title}" loading="lazy">`) : `<div class="mono">${initials(item.title)}</div>`;
+  const pill = `<span class="pill">${opts.group||item.tag||item.eyebrow}</span>`;
   const year = item.year ? `<span class="year">${item.year}</span>` : '';
   const stack = item.stack ? `<div class="stack">${item.stack.map(s=>`<span>${s}</span>`).join('')}</div>` : '';
   let links = '';
@@ -29,14 +29,68 @@ mount('socials', SOCIAL_HTML);
 mount('socials-inline', SOCIAL_HTML);
 mount('stats', [[DATA.graphics.length,'catalog plates'],[DATA.archive.length,'archive pieces'],[DATA.web.length,'web projects'],[DATA.apps.length,'app projects']].map(s=>`<div class="stat"><strong>${String(s[0]).padStart(2,'0')}</strong><small>${s[1]}</small></div>`).join(''));
 
-// graphics catalog with filters (graphics page + index featured)
+// Searchable, grouped print-project gallery with accessible image previews
 const artGrid=document.getElementById('art-grid');
 if(artGrid){
   const filterRoot=document.getElementById('art-filters');
-  const tags=['All',...new Set(DATA.graphics.map(i=>i.tag))]; let activeTag='All';
-  const renderFilters=()=>{filterRoot.innerHTML=tags.map(t=>`<button class="filter ${t===activeTag?'active':''}" data-tag="${t}">${t}</button>`).join('');filterRoot.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{activeTag=b.dataset.tag;renderFilters();renderArt();}));};
-  const renderArt=()=>{const v=activeTag==='All'?DATA.graphics:DATA.graphics.filter(i=>i.tag===activeTag);artGrid.innerHTML=v.map(i=>workCard(i)).join('');};
-  renderFilters();renderArt();
+  const searchInput=document.getElementById('project-search');
+  const countOutput=document.getElementById('project-count');
+  const emptyOutput=document.getElementById('project-empty');
+  const lightbox=document.getElementById('project-lightbox');
+  const lightboxImage=document.getElementById('project-lightbox-image');
+  const lightboxTitle=document.getElementById('project-lightbox-title');
+  const lightboxDescription=document.getElementById('project-lightbox-description');
+  const groups=[
+    {id:'all',label:'All projects',tags:[]},
+    {id:'production',label:'Press & production',tags:['Production']},
+    {id:'institutions',label:'Workwear & institutions',tags:['Institutional']},
+    {id:'schools',label:'Schools & education',tags:['Schools']},
+    {id:'community',label:'NGO & community',tags:['NGO & campaigns','Campaigns']},
+    {id:'events',label:'Sports & events',tags:['Sports & events','Events']},
+    {id:'brands',label:'Brands & packaging',tags:['Brand systems','Packaging']}
+  ];
+  let activeGroup='all';
+  let searchTerm='';
+  let visibleProjects=[];
+  const categoryFor=tag=>groups.find(g=>g.tags.includes(tag))?.label||tag;
+  const projectsFor=group=>group.id==='all'?DATA.graphics:DATA.graphics.filter(item=>group.tags.includes(item.tag));
+  const renderFilters=()=>{
+    filterRoot.innerHTML=groups.map(group=>{
+      const total=projectsFor(group).length;
+      return `<button class="filter ${group.id===activeGroup?'active':''}" type="button" data-group="${group.id}" aria-pressed="${group.id===activeGroup}">${group.label}<span class="filter-count">${total}</span></button>`;
+    }).join('');
+    filterRoot.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{
+      activeGroup=button.dataset.group;
+      renderFilters();
+      renderArt();
+    }));
+  };
+  const openProject=index=>{
+    const item=visibleProjects[index];
+    if(!item||!item.img||!lightbox)return;
+    lightboxImage.src=item.img;
+    lightboxImage.alt=item.alt||item.title;
+    lightboxTitle.textContent=item.title;
+    lightboxDescription.textContent=item.description||'';
+    if(typeof lightbox.showModal==='function')lightbox.showModal();
+  };
+  const renderArt=()=>{
+    const group=groups.find(g=>g.id===activeGroup)||groups[0];
+    const query=searchTerm.trim().toLocaleLowerCase();
+    visibleProjects=projectsFor(group).slice().reverse().filter(item=>{
+      const haystack=[item.title,item.description,item.tag,categoryFor(item.tag)].join(' ').toLocaleLowerCase();
+      return !query||haystack.includes(query);
+    });
+    countOutput.textContent=`Showing ${visibleProjects.length} of ${projectsFor(group).length} projects`;
+    emptyOutput.hidden=visibleProjects.length!==0;
+    artGrid.innerHTML=visibleProjects.map((item,index)=>workCard(item,{gallery:true,index,group:categoryFor(item.tag)})).join('');
+    artGrid.querySelectorAll('[data-gallery-index]').forEach(button=>button.addEventListener('click',()=>openProject(Number(button.dataset.galleryIndex))));
+  };
+  searchInput.addEventListener('input',()=>{searchTerm=searchInput.value;renderArt();});
+  document.getElementById('project-lightbox-close')?.addEventListener('click',()=>lightbox.close());
+  lightbox?.addEventListener('click',event=>{if(event.target===lightbox)lightbox.close();});
+  renderFilters();
+  renderArt();
 }
 mount('featured-graphics', DATA.graphics.slice(-6).map(i=>workCard(i)).join(''));
 mount('archive-grid', DATA.archive.map(i=>workCard({...i,tag:'Archive'})).join(''));

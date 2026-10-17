@@ -15,3 +15,30 @@ footer{padding:30px 0 44px;color:#8e969c;font-size:11px;background:#0f1113;borde
 @media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:repeat(2,1fr)}.rogue{grid-template-columns:1fr}.disciplines,.cap-grid{grid-template-columns:1fr}.impact{grid-template-columns:1fr;gap:24px}}
 @media(max-width:900px){.hero-grid,.about,.contact{grid-template-columns:1fr}.hero-card{grid-template-columns:110px 1fr}.hero-photo{width:110px;height:145px}.section-head{align-items:start;flex-direction:column}.head-more{align-items:flex-start}.stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.shell{padding:0 16px}.brand span{display:none}.nav{gap:12px}.navlinks{font-size:12px;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:5px}.navlinks a{white-space:nowrap}.navcta{padding:9px 12px}.hero{padding:52px 0}.hero-card{grid-template-columns:1fr}.hero-photo{width:100%;height:240px}.grid,.steps{grid-template-columns:1fr}.section{padding:56px 0}.contact,.cta,.impact{padding:25px}.foot-row{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:1fr 1fr}}
+
+/* Project browsing and full-size previews */
+.gallery-tools{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:0 0 16px;flex-wrap:wrap}
+.gallery-search{display:grid;gap:7px;min-width:min(100%,320px);color:#b7bdc1;font-size:11px;text-transform:uppercase;letter-spacing:.09em}
+.gallery-search input{width:min(100%,390px);min-height:44px;border:1px solid #454d53;border-radius:7px;background:#171b1e;color:#f5f3ee;padding:0 13px;font:inherit;font-size:14px;letter-spacing:0;text-transform:none;outline:none}
+.gallery-search input::placeholder{color:#777f85}
+.gallery-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(242,106,33,.16)}
+.project-count{margin:0;color:#9fa6ab;font-size:12px}
+.filter{display:inline-flex;align-items:center;gap:8px}
+.filter-count{display:inline-grid;place-items:center;min-width:21px;height:21px;padding:0 5px;border-radius:99px;background:rgba(255,255,255,.09);font-size:10px}
+.filter.active .filter-count{background:rgba(0,0,0,.16)}
+.project-preview{position:relative;display:block;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:zoom-in;text-align:left}
+.project-preview img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
+.project-preview span{position:absolute;right:10px;bottom:10px;border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:7px 9px;background:rgba(15,17,19,.82);color:#fff;font-size:10px;font-weight:750;opacity:.95}
+.project-preview:hover img{transform:scale(1.04)}
+.project-preview:focus-visible{outline:3px solid var(--signal);outline-offset:-3px}
+.project-empty{padding:30px;border:1px dashed #51585d;border-radius:10px;color:#bdc1c4;text-align:center}
+.project-lightbox{width:min(94vw,1120px);max-width:none;max-height:92vh;padding:0;border:1px solid #4b5359;border-radius:12px;background:#111416;color:#f7f5ef;overflow:auto}
+.project-lightbox::backdrop{background:rgba(0,0,0,.84);backdrop-filter:blur(5px)}
+.project-lightbox-frame{position:relative;padding:16px}
+.project-lightbox img{display:block;width:100%;height:min(72vh,760px);object-fit:contain;background:#090b0c;border-radius:8px}
+.project-lightbox-close{position:absolute;z-index:1;top:24px;right:24px;display:flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.35);border-radius:6px;padding:8px 11px;background:rgba(12,14,15,.88);color:#fff;font-weight:750;cursor:pointer}
+.project-lightbox-close span{font-size:19px;line-height:1}
+.project-lightbox-caption{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:11px 2px 1px}
+.project-lightbox-caption h3{margin:0;font-size:17px}
+.project-lightbox-caption p{margin:0;color:#abb1b5;font-size:12px;text-align:right}
+@media(max-width:620px){.gallery-tools{align-items:stretch}.gallery-search{min-width:100%}.gallery-search input{width:100%}.project-lightbox{width:100vw;max-height:94vh;border-radius:10px}.project-lightbox-frame{padding:10px}.project-lightbox img{height:68vh}.project-lightbox-caption{display:block;padding:10px 2px}.project-lightbox-caption p{text-align:left;margin-top:4px}.project-lightbox-close{top:16px;right:16px}}

@@ -46,3 +46,20 @@ mount('app-grid', DATA.apps.map(i=>workCard(i)).join(''));
 mount('featured-web', DATA.web.slice(-3).map(i=>workCard(i)).join(''));
 mount('featured-apps', DATA.apps.slice(-3).map(i=>workCard(i)).join(''));
 mount('rogue-areas', ROGUE_AREAS.map(a=>`<span>${a}</span>`).join(''));
+
+// mobile navigation
+(() => {
+  const toggle = document.querySelector('.menu-toggle');
+  if (!toggle) return;
+  const close = () => {
+    document.body.classList.remove('menu-open');
+    toggle.setAttribute('aria-expanded', 'false');
+  };
+  toggle.addEventListener('click', () => {
+    const open = document.body.classList.toggle('menu-open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.querySelectorAll('#site-menu a').forEach(link => link.addEventListener('click', close));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 1024) close(); });
+})();

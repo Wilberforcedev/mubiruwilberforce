@@ -753,3 +753,6 @@ body.menu-open .menu-toggle span:nth-child(3){transform:translateY(-7px) rotate(
 .case-evidence strong{display:block;color:var(--ink);font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px}
 .case-evidence p{margin:0 0 12px}
 .case-evidence .stack{margin-top:6px}
+
+/* Keep responsive image sources from changing existing image layouts. */
+picture{display:contents}

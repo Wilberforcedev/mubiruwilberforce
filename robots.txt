@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://wilberforcedev.github.io/mubiruwilberforce/sitemap.xml

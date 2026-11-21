@@ -8,13 +8,14 @@ const ICONS = {
 const SWATCH = ['#ff5a1f','#ffd23f','#1f8a4c','#0f4c81','#7b2d8b','#111','#f4f1ea','#c1121f'];
 function initials(t){return t.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
 function workCard(item, opts={}){
-  const media = item.img ? (opts.gallery ? `<button type="button" class="project-preview" data-gallery-index="${opts.index}" aria-label="Open larger project photo"><img src="${item.img}" alt="${item.alt||item.title}" loading="lazy" decoding="async"><span>View photo <b aria-hidden="true">↗</b></span></button>` : `<img src="${item.img}" alt="${item.alt||item.title}" loading="lazy">`) : `<div class="mono">${initials(item.title)}</div>`;
+  const media = item.img ? (opts.gallery ? `<button type="button" class="project-preview" data-gallery-index="${opts.index}" aria-label="Open larger project photo"><img src="${item.img}" alt="${item.alt||item.title}" loading="lazy" decoding="async"><span>View photo <b aria-hidden="true">↗</b></span></button>` : `<img src="${item.img}" alt="${item.alt||item.title}" loading="lazy" decoding="async">`) : `<div class="mono">${initials(item.title)}</div>`;
   const pill = `<span class="pill">${opts.group||item.tag||item.eyebrow}</span>`;
   const year = item.year ? `<span class="year">${item.year}</span>` : '';
   const stack = item.stack ? `<div class="stack">${item.stack.map(s=>`<span>${s}</span>`).join('')}</div>` : '';
+  const evidence = item.evidence ? `<div class="case-evidence"><strong>Evidence shown</strong><p>${item.evidence}</p><strong>Related production skills</strong><div class="stack">${item.skills.map(s=>`<span>${s}</span>`).join('')}</div></div>` : '';
   let links = '';
   if(item.repo){ links = `<div class="work-links"><a href="${item.repo}" target="_blank" rel="noopener">View project ↗</a>${item.demo?`<a href="${item.demo}" target="_blank" rel="noopener">Open demo ↗</a>`:''}</div>`; }
-  return `<article class="work-card"><div class="work-media">${media}</div><div class="work-body"><div class="work-top">${pill}${year}</div><h3>${item.title}</h3><p>${item.description}</p>${stack}${links}</div></article>`;
+  return `<article class="work-card"><div class="work-media">${media}</div><div class="work-body"><div class="work-top">${pill}${year}</div><h3>${item.title}</h3><p>${item.description}</p>${stack}${evidence}${links}</div></article>`;
 }
 function stepCard(s){
   return `<article class="step"><div class="step-media">${s.img?`<img src="${s.img}" alt="${s.title}" loading="lazy">`:`<div class="swatches">${SWATCH.map(c=>`<i style="background:${c}"></i>`).join('')}</div>`}</div><div class="step-body"><div class="step-num">STEP ${s.step}</div><h3>${s.title}</h3><p>${s.description}</p></div></article>`;
@@ -27,6 +28,7 @@ mount('year', new Date().getFullYear());
 const SOCIAL_HTML = DATA.social.map(s=>`<a href="${s.href}" target="_blank" rel="noopener" aria-label="${s.name}" title="${s.name}">${ICONS[s.icon]}</a>`).join('');
 mount('socials', SOCIAL_HTML);
 mount('socials-inline', SOCIAL_HTML);
+mount('case-study-grid', (DATA.caseStudies||[]).map(item=>workCard(item)).join(''));
 mount('stats', [[DATA.graphics.length,'catalog plates'],[DATA.archive.length,'archive pieces'],[DATA.web.length,'web projects'],[DATA.apps.length,'app projects']].map(s=>`<div class="stat"><strong>${String(s[0]).padStart(2,'0')}</strong><small>${s[1]}</small></div>`).join(''));
 
 // Searchable, grouped print-project gallery with accessible image previews
@@ -52,6 +54,9 @@ if(artGrid){
   let activeGroup='all';
   let searchTerm='';
   let visibleProjects=[];
+  let shownLimit=18;
+  const pageSize=18;
+  const loadMore=document.getElementById('load-more-projects');
   const categoryFor=tag=>groups.find(g=>g.tags.includes(tag))?.label||tag;
   const projectsFor=group=>group.id==='all'?DATA.graphics:DATA.graphics.filter(item=>group.tags.includes(item.tag));
   const renderFilters=()=>{
@@ -61,6 +66,7 @@ if(artGrid){
     }).join('');
     filterRoot.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{
       activeGroup=button.dataset.group;
+      shownLimit=pageSize;
       renderFilters();
       renderArt();
     }));
@@ -81,12 +87,14 @@ if(artGrid){
       const haystack=[item.title,item.description,item.tag,categoryFor(item.tag)].join(' ').toLocaleLowerCase();
       return !query||haystack.includes(query);
     });
-    countOutput.textContent=`Showing ${visibleProjects.length} of ${projectsFor(group).length} projects`;
+    countOutput.textContent=`Showing ${Math.min(shownLimit,visibleProjects.length)} of ${visibleProjects.length} matching projects`;
     emptyOutput.hidden=visibleProjects.length!==0;
-    artGrid.innerHTML=visibleProjects.map((item,index)=>workCard(item,{gallery:true,index,group:categoryFor(item.tag)})).join('');
+    artGrid.innerHTML=visibleProjects.slice(0,shownLimit).map((item,index)=>workCard(item,{gallery:true,index,group:categoryFor(item.tag)})).join('');
+    if(loadMore){loadMore.hidden=visibleProjects.length<=shownLimit;loadMore.textContent=`Show more projects (${visibleProjects.length-shownLimit} remaining)`;}
     artGrid.querySelectorAll('[data-gallery-index]').forEach(button=>button.addEventListener('click',()=>openProject(Number(button.dataset.galleryIndex))));
   };
-  searchInput.addEventListener('input',()=>{searchTerm=searchInput.value;renderArt();});
+  searchInput.addEventListener('input',()=>{searchTerm=searchInput.value;shownLimit=pageSize;renderArt();});
+  loadMore?.addEventListener('click',()=>{shownLimit+=pageSize;renderArt();});
   document.getElementById('project-lightbox-close')?.addEventListener('click',()=>lightbox.close());
   lightbox?.addEventListener('click',event=>{if(event.target===lightbox)lightbox.close();});
   renderFilters();

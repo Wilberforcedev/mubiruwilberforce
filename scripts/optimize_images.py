@@ -4,8 +4,8 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 IMAGE_DIR = Path(__file__).resolve().parents[1] / "assets" / "img"
-MAX_SIZE = (1440, 1440)
-QUALITY = 82
+MAX_SIZE = (640, 640)
+QUALITY = 76
 
 
 def main():

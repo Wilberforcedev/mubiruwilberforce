@@ -8,7 +8,9 @@ const ICONS = {
 const SWATCH = ['#ff5a1f','#ffd23f','#1f8a4c','#0f4c81','#7b2d8b','#111','#f4f1ea','#c1121f'];
 function initials(t){return t.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
 function workCard(item, opts={}){
-  const media = item.img ? (opts.gallery ? `<button type="button" class="project-preview" data-gallery-index="${opts.index}" aria-label="Open larger project photo"><img src="${item.img}" alt="${item.alt||item.title}" loading="lazy" decoding="async"><span>View photo <b aria-hidden="true">↗</b></span></button>` : `<img src="${item.img}" alt="${item.alt||item.title}" loading="lazy" decoding="async">`) : `<div class="mono">${initials(item.title)}</div>`;
+  const webp = item.img?.replace(/\.(jpe?g|png)$/i, ".webp");
+  const picture = `<picture><source srcset="${webp}" type="image/webp"><img src="${item.img}" alt="${item.alt||item.title}" loading="lazy" decoding="async"></picture>`;
+  const media = item.img ? (opts.gallery ? `<button type="button" class="project-preview" data-gallery-index="${opts.index}" aria-label="Open larger project photo">${picture}<span>View photo <b aria-hidden="true">↗</b></span></button>` : picture) : `<div class="mono">${initials(item.title)}</div>`;
   const pill = `<span class="pill">${opts.group||item.tag||item.eyebrow}</span>`;
   const year = item.year ? `<span class="year">${item.year}</span>` : '';
   const stack = item.stack ? `<div class="stack">${item.stack.map(s=>`<span>${s}</span>`).join('')}</div>` : '';
@@ -18,7 +20,7 @@ function workCard(item, opts={}){
   return `<article class="work-card"><div class="work-media">${media}</div><div class="work-body"><div class="work-top">${pill}${year}</div><h3>${item.title}</h3><p>${item.description}</p>${stack}${evidence}${links}</div></article>`;
 }
 function stepCard(s){
-  return `<article class="step"><div class="step-media">${s.img?`<img src="${s.img}" alt="${s.title}" loading="lazy">`:`<div class="swatches">${SWATCH.map(c=>`<i style="background:${c}"></i>`).join('')}</div>`}</div><div class="step-body"><div class="step-num">STEP ${s.step}</div><h3>${s.title}</h3><p>${s.description}</p></div></article>`;
+  return `<article class="step"><div class="step-media">${s.img?`<picture><source srcset="${s.img.replace(/\.(jpe?g|png)$/i, ".webp")}" type="image/webp"><img src="${s.img}" alt="${s.title}" loading="lazy" decoding="async"></picture>`:`<div class="swatches">${SWATCH.map(c=>`<i style="background:${c}"></i>`).join('')}</div>`}</div><div class="step-body"><div class="step-num">STEP ${s.step}</div><h3>${s.title}</h3><p>${s.description}</p></div></article>`;
 }
 function mount(id, html){const el=document.getElementById(id); if(el) el.innerHTML=html;}
 const ROGUE_AREAS = ['Web & application development','UI & digital product development','Branding & visual identity','Logo & graphic design','Apparel & merchandise branding','Screen printing, DTF, sublimation & vinyl','Product ideation & development','Client & stakeholder engagement','Technology & creative problem-solving'];
